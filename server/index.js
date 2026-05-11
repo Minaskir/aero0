@@ -26,6 +26,17 @@ Order.belongsTo(User, { foreignKey: 'userId' });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isVercel = process.env.VERCEL === '1';
+let databaseReadyPromise;
+
+const ensureDatabaseReady = () => {
+    if (!databaseReadyPromise) {
+        databaseReadyPromise = sequelize.authenticate()
+            .then(() => sequelize.sync({ alter: process.env.DB_SYNC_ALTER !== 'false' }));
+    }
+
+    return databaseReadyPromise;
+};
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -40,6 +51,16 @@ const transporter = nodemailer.createTransport({
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
+
+app.use('/api', async (req, res, next) => {
+    try {
+        await ensureDatabaseReady();
+        next();
+    } catch (e) {
+        console.error('Database init error:', e);
+        res.status(500).json({ message: 'Database connection error' });
+    }
+});
 
 // --- Helper: Create Log ---
 const createLog = async (userId, userName, action, details) => {
@@ -510,7 +531,7 @@ app.patch('/api/admin/orders/:id/item-status', authMiddleware, adminMiddleware, 
 });
 
 // СИМУЛЯЦИЯ КУХНИ
-setInterval(async () => {
+const startKitchenSimulation = () => setInterval(async () => {
     try {
         const orders = await Order.findAll();
         const next = { 'pending': 'cooking', 'cooking': 'ready', 'ready': 'delivered' };
@@ -666,9 +687,13 @@ app.get('/api/flights/:event', async (req, res) => {
 
 const start = async () => {
     try {
-        await sequelize.authenticate();
-        await sequelize.sync({ alter: true });
+        await ensureDatabaseReady();
+        startKitchenSimulation();
         app.listen(PORT, '0.0.0.0', () => console.log(`Сервер запущен на порту: ${PORT}`));
     } catch (e) { console.error(e); }
 };
-start();
+if (!isVercel) {
+    start();
+}
+
+module.exports = app;

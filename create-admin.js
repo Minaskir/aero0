@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 async function createAdmin() {
     try {
         await sequelize.authenticate();
+        await sequelize.sync();
         
         const email = 'admin@aerocafe.ru';
         const password = 'admin';
