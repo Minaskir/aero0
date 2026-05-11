@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Кафе Манго — в аэропорту</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/styles.css">
+	<link rel="stylesheet" href="../css/animations.css">
+</head>
+<body>
+	<header class="site-header">
+		<div class="container header-inner">
+			<a class="logo" href="../index.html">АэроКафе</a>
+			<nav class="nav">
+	<button class="nav-toggle" aria-label="Меню">☰</button>
+				<ul class="nav-list">
+	<!-- Заполняется динамически -->
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<section class="header-cover">
+		<div class="container">
+			<h1 class="title">Манго</h1>
+			<p class="subtitle">Смузи, десерты и легкие завтраки</p>
+		</div>
+	</section>
+	<main class="container cafe-content">
+		<div class="cafe-grid">
+				<img class="cafe-photo" src="../photo/mango.jpg" alt="Кафе Манго">			
+				<div class="info">
+				<h3>О кафе</h3>
+				<p>«Манго» — яркое и уютное пространство, где можно быстро перекусить или насладиться свежими фруктовыми смузи перед полётом.</p>
+				<h3>Контакты</h3>
+				<div class="kv">
+					<div>Телефон</div><div><a href="tel:+79876001900">+7 (987) 600-19-00</a></div>
+					<div>Менеджер</div><div>Ежедневно 09:00–18:00</div>
+				</div>
+				<h3>Меню</h3>
+				<div class="cafe-menu-grid">
+					<div>
+						<div class="cafe-menu-section">
+							<h4>Смузи и напитки</h4>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Манго-папайя смузи</div>
+								<div class="cafe-item-price">320 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Зеленый детокс</div>
+								<div class="cafe-item-price">280 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Клубнично-банановый</div>
+								<div class="cafe-item-price">290 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Латте с овсяным молоком</div>
+								<div class="cafe-item-price">250 ₽</div>
+							</div>
+						</div>
+						
+						<div class="cafe-menu-section">
+							<h4>Десерты</h4>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Чизкейк с маракуйей</div>
+								<div class="cafe-item-price">280 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Тарт с лимоном и меренгой</div>
+								<div class="cafe-item-price">260 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Кокосовое печенье</div>
+								<div class="cafe-item-price">180 ₽</div>
+							</div>
+						</div>
+					</div>
+					
+					<div>
+						<div class="cafe-menu-section">
+							<h4>Завтраки</h4>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Тост с авокадо и семенами чиа</div>
+								<div class="cafe-item-price">380 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Гранола с греческим йогуртом</div>
+								<div class="cafe-item-price">320 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Акаи-боул с ягодами</div>
+								<div class="cafe-item-price">420 ₽</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<h3>Инфо</h3>
+				<div class="kv">
+					<div>Расположение</div><div>Терминал A, 2 этаж, рядом с Gate 12</div>
+					<div>Часы работы</div><div>Круглосуточно</div>
+					<div>Предложение</div><div>Кофе, смузи, выпечка, лёгкие блюда</div>
+				</div>
+			</div>
+		</div>
+		
+		<section class="booking-section container">
+			<h2>Забронировать стол</h2>
+			<div class="booking-info">
+				<p>Оформите бронь онлайн, и мы свяжемся с вами для подтверждения.</p>
+				<div class="booking-note">
+					<strong>Условие:</strong> Бронь доступна при заказе от 2000 рублей
+				</div>
+			</div>
+			<div class="booking-action">
+				<button type="button" class="button booking-open-btn" data-cafe="Манго">Забронировать</button>
+			</div>
+		</section>
+	</main>
+
+	<footer class="site-footer">
+		<div class="container">
+			<p>© 2025 АэроКафе</p>
+		</div>
+	</footer>
+	<div id="bookingModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h3>Бронирование столика</h3>
+			<form class="booking-form">
+				<input type="hidden" name="cafe" class="booking-cafe-input" value="Манго">
+				<label>
+					<span>Имя</span>
+					<input type="text" name="name" required>
+				</label>
+				<label>
+					<span>Телефон</span>
+					<input type="tel" name="phone" required>
+				</label>
+				<label>
+					<span>Количество гостей</span>
+					<input type="number" name="guests" min="1" required>
+				</label>
+				<label>
+					<span>Дата</span>
+					<input type="date" name="date" required>
+				</label>
+				<label>
+					<span>Время</span>
+					<input type="time" name="time" required>
+				</label>
+				<button type="submit" class="button">Отправить бронь</button>
+			</form>
+		</div>
+	</div>
+
+	<script src="../js/main.js"></script>
+</body>
+</html>

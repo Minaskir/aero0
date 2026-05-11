@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Оплата заказа — АэроКафе</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="./css/styles.css">
+	<link rel="stylesheet" href="./css/animations.css">
+    <style>
+        .checkout-page { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .checkout-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 500px; padding: 32px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+        
+        .payment-methods { display: flex; gap: 12px; margin-bottom: 24px; }
+        .method-btn { flex: 1; padding: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); border-radius: 12px; color: var(--muted); cursor: pointer; text-align: center; transition: all 0.3s ease; }
+        .method-btn.active { border-color: var(--brand); color: var(--brand); background: rgba(135,206,235,0.1); }
+        
+        .card-view { background: linear-gradient(135deg, #1e293b, #0c111c); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; margin-bottom: 24px; position: relative; overflow: hidden; }
+        .card-view::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); }
+        
+        .qr-view { text-align: center; padding: 20px; display: none; }
+        .qr-placeholder { width: 200px; height: 200px; background: white; margin: 0 auto 16px; padding: 10px; border-radius: 12px; }
+
+        .processing-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top-color: var(--brand); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+	<main class="container checkout-page">
+		<div class="checkout-card">
+			<h2 style="margin-bottom: 24px;">Оплата заказа</h2>
+            
+            <div style="margin-bottom: 24px; font-size: 18px;">
+                К оплате: <strong id="checkoutTotal" style="color: var(--brand)">0 ₽</strong>
+            </div>
+
+            <div class="payment-methods">
+                <div class="method-btn active" onclick="setMethod('card')">💳 Карта</div>
+                <div class="method-btn" onclick="setMethod('qr')">📱 QR-код</div>
+            </div>
+
+            <!-- Вид карты -->
+            <div id="cardSection">
+                <div class="card-view">
+                    <div style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">Номер карты</div>
+                    <div id="displayCardNum" style="font-size: 20px; letter-spacing: 2px;">•••• •••• •••• ••••</div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+                        <div>
+                            <div style="font-size: 10px; color: var(--muted);">Срок</div>
+                            <div id="displayCardDate">MM/YY</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 10px; color: var(--muted);">CVV</div>
+                            <div>•••</div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="paymentForm" class="booking-form">
+                    <label>
+                        <span>Номер карты</span>
+                        <input type="text" id="cardNum" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                    </label>
+                    <div class="form-grid">
+                        <label>
+                            <span>Срок действия</span>
+                            <input type="text" id="cardDate" placeholder="MM/YY" maxlength="5" required>
+                        </label>
+                        <label>
+                            <span>CVV</span>
+                            <input type="password" id="cardCvv" placeholder="***" maxlength="3" required>
+                        </label>
+                    </div>
+                    <button type="submit" class="button w-100" style="margin-top: 16px;">Оплатить заказ</button>
+                </form>
+            </div>
+
+            <!-- Вид QR -->
+            <div id="qrSection" class="qr-view">
+                <div class="qr-placeholder">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=aerocafe-payment" alt="QR Code">
+                </div>
+                <p style="color: var(--muted); font-size: 14px; margin-bottom: 20px;">Отсканируйте код в приложении банка для оплаты через СБП</p>
+                <button onclick="processPayment('qr')" class="button w-100">Я оплатил</button>
+            </div>
+		</div>
+	</main>
+
+    <!-- Окно обработки -->
+    <div id="processingOverlay" class="processing-overlay">
+        <div class="spinner"></div>
+        <h2 id="processText">Обработка платежа...</h2>
+        <p style="color: var(--muted); margin-top: 10px;">Пожалуйста, не закрывайте страницу</p>
+    </div>
+
+	<script>
+        let currentMethod = 'card';
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const total = cart.reduce((sum, i) => sum + (i.price * i.count), 0);
+        
+        document.getElementById('checkoutTotal').textContent = `${total} ₽`;
+
+        function setMethod(method) {
+            currentMethod = method;
+            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('cardSection').style.display = method === 'card' ? 'block' : 'none';
+            document.getElementById('qrSection').style.display = method === 'qr' ? 'block' : 'none';
+        }
+
+        // Живое отображение карты
+        document.getElementById('cardNum').addEventListener('input', e => {
+            let val = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = val;
+            document.getElementById('displayCardNum').textContent = val || '•••• •••• •••• ••••';
+        });
+
+        document.getElementById('cardDate').addEventListener('input', e => {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length >= 2) val = val.slice(0,2) + '/' + val.slice(2,4);
+            e.target.value = val;
+            document.getElementById('displayCardDate').textContent = val || 'MM/YY';
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', e => {
+            e.preventDefault();
+            processPayment('card');
+        });
+
+        async function processPayment(method) {
+            const overlay = document.getElementById('processingOverlay');
+            overlay.style.display = 'flex';
+
+            // Имитация задержки банка
+            await new Promise(r => setTimeout(r, 2000));
+            document.getElementById('processText').textContent = 'Связь с банком...';
+            await new Promise(r => setTimeout(r, 1500));
+            document.getElementById('processText').textContent = 'Завершение...';
+
+            // Сохранение заказа на сервере
+            try {
+                const res = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        items: cart,
+                        totalAmount: total,
+                        paymentMethod: method
+                    })
+                });
+
+                if (res.ok) {
+                    localStorage.removeItem('cart');
+                    document.getElementById('processText').textContent = 'Оплата успешно завершена!';
+                    setTimeout(() => {
+                        window.location.href = '/profile.html';
+                    }, 1500);
+                } else {
+                    alert('Ошибка при сохранении заказа');
+                    overlay.style.display = 'none';
+                }
+            } catch (err) {
+                alert('Ошибка соединения с сервером');
+                overlay.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

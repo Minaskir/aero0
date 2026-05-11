@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Связь с нами — АэроКафе</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="./css/styles.css">
+	<link rel="stylesheet" href="./css/animations.css">
+    <style>
+        .contacts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 32px; margin-top: 40px; }
+        .premium-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 20px; }
+        .form-group span { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--brand); }
+        
+        input, textarea, select { 
+            width: 100%; 
+            background: rgba(255,255,255,0.05) !important; 
+            border: 1px solid var(--border) !important; 
+            border-radius: 12px !important; 
+            padding: 14px 18px !important; 
+            color: white !important; 
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        /* Чтобы варианты в списке были видны */
+        select option {
+            background: #1a2333;
+            color: white;
+        }
+
+        input:focus, textarea:focus, select:focus { 
+            border-color: var(--brand) !important; 
+            box-shadow: 0 0 0 4px rgba(135,206,235,0.1) !important;
+            outline: none;
+        }
+
+        .submit-btn { background: var(--brand); color: #0c111c; font-weight: 700; text-transform: uppercase; padding: 16px !important; margin-top: 10px; }
+        .invalid-input { border-color: #ef4444 !important; }
+    </style>
+</head>
+<body>
+	<header class="site-header">
+		<div class="container header-inner">
+			<a class="logo" href="./index.html">АэроКафе</a>
+			<nav class="nav">
+                <button class="nav-toggle" aria-label="Меню">☰</button>
+				<ul class="nav-list">
+                    <!-- Заполняется динамически через js/main.js -->
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<section class="header-cover">
+		<div class="container">
+			<h1 class="title">Связь с нами</h1>
+			<p class="subtitle">Отзывы и работа в нашей команде</p>
+		</div>
+	</section>
+
+	<main class="container">
+        <div class="contacts-grid">
+            <section class="premium-card animate-in">
+                <h3 style="margin-bottom: 12px; font-size: 24px;">Оставить отзыв</h3>
+                <form id="feedbackForm">
+                    <div class="form-group">
+                        <span>Ваше имя</span>
+                        <input type="text" name="name" required placeholder="Например: Иван Иванов">
+                    </div>
+                    <div class="form-group">
+                        <span>Телефон (11 цифр)</span>
+                        <input type="text" name="contact" class="only-digits" placeholder="Например: 89001234567" required>
+                    </div>
+                    <div class="form-group">
+                        <span>Ваше сообщение</span>
+                        <textarea name="message" rows="5" required placeholder="Напишите ваш отзыв или предложение..."></textarea>
+                    </div>
+                    <button class="button w-100 submit-btn" type="submit">Отправить отзыв</button>
+                </form>
+            </section>
+
+            <section class="premium-card animate-in" style="animation-delay: 0.2s;">
+                <h3 style="margin-bottom: 12px; font-size: 24px;">Работа у нас</h3>
+                <form id="jobForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <span>Имя</span>
+                            <input type="text" name="name" required placeholder="Иван">
+                        </div>
+                        <div class="form-group">
+                            <span>Телефон</span>
+                            <input type="text" name="phone" class="only-digits" placeholder="89001234567" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <span>Email</span>
+                        <input type="email" name="email" required placeholder="ivanov@example.com">
+                    </div>
+                    <div class="form-group">
+                        <span>Желаемая должность</span>
+                        <select name="position" required>
+                            <option value="" disabled selected>Выберите вакансию</option>
+                            <option value="Хостес">Хостес</option>
+                            <option value="Официант">Официант</option>
+                            <option value="Повар">Повар</option>
+                            <option value="Бариста">Бариста</option>
+                            <option value="Фейс-контроль">Фейс-контроль</option>
+                            <option value="Администратор">Администратор</option>
+                            <option value="Посудомойщица">Посудомойщица</option>
+                            <option value="Уборщица">Уборщица</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <span>Опыт работы</span>
+                        <textarea name="experience" rows="3" placeholder="Например: 2 года в ресторане 'Звезда', умею готовить кофе..."></textarea>
+                    </div>
+                    <button class="button w-100 submit-btn" type="submit">Подать заявку</button>
+                </form>
+            </section>
+        </div>
+	</main>
+
+	<footer class="site-footer">
+		<div class="container"><p>© 2025 АэроКафе</p></div>
+	</footer>
+
+    <script src="./js/main.js"></script>
+	<script>
+        // Блокировка букв и ограничение 11 цифр
+        document.querySelectorAll('.only-digits').forEach(input => {
+            input.addEventListener('input', (e) => {
+                let val = e.target.value.replace(/\D/g, '');
+                if (val.length > 11) val = val.slice(0, 11);
+                e.target.value = val;
+            });
+        });
+
+        function notify(msg, type = 'success') {
+            if (window.showNotification) window.showNotification(msg, type);
+            else alert(msg);
+        }
+
+        document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            if (data.contact.length < 11) return notify('Введите 11 цифр телефона', 'error');
+            
+            try {
+                const res = await fetch('/api/messages', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) { notify('Отзыв отправлен!', 'success'); e.target.reset(); }
+            } catch (err) { notify('Ошибка отправки', 'error'); }
+        });
+
+        document.getElementById('jobForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            if (data.phone.length < 11) return notify('Введите 11 цифр телефона', 'error');
+
+            try {
+                const res = await fetch('/api/applications', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) { notify('Анкета принята!', 'success'); e.target.reset(); }
+            } catch (err) { notify('Ошибка отправки', 'error'); }
+        });
+
+        // Навигация (дублируем логику для надежности)
+        const token = localStorage.getItem('token');
+        const userName = localStorage.getItem('userName');
+        if (token) {
+            const btn = document.getElementById('navAuthBtn');
+            if (btn) {
+                btn.textContent = userName || 'Профиль';
+                btn.href = localStorage.getItem('role') === 'admin' ? './admin.html' : './profile.html';
+            }
+        }
+    </script>
+</body>
+</html>

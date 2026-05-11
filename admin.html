@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Панель администратора — АэроКафе</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="./css/styles.css">
+	<link rel="stylesheet" href="./css/animations.css">
+    <style>
+        .admin-section { padding: 40px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; text-align: center; }
+        .stat-card h3 { font-size: 14px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+        .stat-card p { font-size: 28px; font-weight: 700; color: var(--brand); }
+
+        .tabs { display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px; overflow-x: auto; }
+        .tab-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 8px 16px; font-weight: 600; border-radius: 8px; white-space: nowrap; }
+        .tab-btn.active { background: rgba(135,206,235,0.1); color: var(--brand); }
+
+        .admin-table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 12px; }
+        .admin-table th, .admin-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+        .admin-table th { background: rgba(0,0,0,0.2); color: var(--brand); font-weight: 700; }
+        
+        .status-select { background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; outline: none; }
+        .status-select option { background: #1e293b; }
+
+        /* Цвета для должностей */
+        .position-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; background: rgba(135,206,235,0.15); color: var(--brand); font-size: 12px; font-weight: 600; }
+        
+        /* Цвета для статусов вакансий */
+        .job-status-pending { border-left: 4px solid #64748b; }
+        .job-status-interviewing { border-left: 4px solid #f59e0b; }
+        .job-status-rejected { border-left: 4px solid #ef4444; }
+        .job-status-hired { border-left: 4px solid #22c55e; }
+    </style>
+</head>
+<body>
+	<header class="site-header">
+		<div class="container header-inner">
+			<a class="logo" href="/">АэроКафе <span style="font-size: 0.8em; color: var(--brand);">ADMIN</span></a>
+            <button class="button" onclick="logout()" style="background: transparent; border: 1px solid var(--border);">Выйти</button>
+		</div>
+	</header>
+
+	<main class="container admin-section">
+		<div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><h3>Выручка</h3><p id="statRevenue">0 ₽</p></div>
+            <div class="stat-card"><h3>Заказы</h3><p id="statOrders">0</p></div>
+            <div class="stat-card"><h3>Брони</h3><p id="statBookings">0</p></div>
+            <div class="stat-card"><h3>Клиенты</h3><p id="statUsers">0</p></div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('orders')">Заказы</button>
+            <button class="tab-btn" onclick="showTab('bookings')">Бронирования</button>
+            <button class="tab-btn" onclick="showTab('menu')">Меню</button>
+            <button class="tab-btn" onclick="showTab('messages')">Отзывы</button>
+            <button class="tab-btn" onclick="showTab('jobs')">Вакансии</button>
+            <button class="tab-btn" onclick="showTab('users')">Клиенты</button>
+            <button class="tab-btn" onclick="showTab('settings')">Настройки</button>
+            <button class="tab-btn" onclick="showTab('logs')">Логи</button>
+            <button class="tab-btn" onclick="showTab('notify')">Оповестить</button>
+        </div>
+
+        <div id="settingsTab" class="tab-content" style="display: none;">
+            <div class="stat-card" style="max-width: 600px; margin: 0 auto; text-align: left;">
+                <h3 style="margin-bottom: 20px;">Глобальные настройки системы</h3>
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--brand); font-weight: bold;">Yandex API Key (Табло рейсов)</label>
+                        <input type="password" id="set_yandex_api_key" class="status-select" style="width: 100%; padding: 10px;" placeholder="Ключ от Яндекс Расписаний">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Контактный телефон (для сайта)</label>
+                        <input type="text" id="set_contact_phone" class="status-select" style="width: 100%; padding: 10px;" placeholder="+7 (900) 000-00-00">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Email для уведомлений (админ)</label>
+                        <input type="email" id="set_admin_email" class="status-select" style="width: 100%; padding: 10px;" placeholder="admin@aerocafe.ru">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Время ожидания заказа (мин)</label>
+                        <input type="number" id="set_wait_time" class="status-select" style="width: 100%; padding: 10px;" placeholder="20">
+                    </div>
+                    
+                    <button class="button" onclick="saveAllSettings()" style="margin-top: 10px;">Сохранить все настройки</button>
+                    <p id="settingsStatus" style="font-size: 13px; text-align: center;"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="usersTab" class="tab-content" style="display: none;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Имя / Email</th>
+                        <th>Телефон</th>
+                        <th>Роль</th>
+                        <th>Регистрация</th>
+                        <th>Заказы</th>
+                        <th>LTV (Всего потрачено)</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="usersBody"></tbody>
+            </table>
+        </div>
+
+        <div id="ordersTab" class="tab-content">
+            <table class="admin-table">
+                <thead><tr><th>ID / Дата</th><th>Состав и статусы</th><th>Итого</th></tr></thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
+
+        <div id="bookingsTab" class="tab-content" style="display: none;">
+            <div style="margin-bottom: 12px; display: flex; justify-content: flex-end;">
+                <button class="button" onclick="exportData('bookings')" style="padding: 8px 16px; font-size: 14px;">📊 Экспорт в Excel</button>
+            </div>
+            <table class="admin-table">
+                <thead><tr><th>Дата/Время</th><th>Кафе</th><th>Клиент</th><th>Статус</th></tr></thead>
+                <tbody id="bookingsBody"></tbody>
+            </table>
+        </div>
+
+        <div id="menuTab" class="tab-content" style="display: none;">
+            <div style="margin-bottom: 24px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                <h3 style="margin-bottom: 16px; font-size: 16px;">Добавить новое блюдо</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: flex-end;">
+                    <div>
+                        <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px;">Название</label>
+                        <input type="text" id="addMenuName" class="status-select" style="width:100%; padding:8px;" placeholder="Напр: Капучино">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px;">Категория</label>
+                        <select id="addMenuCategory" class="status-select" style="width:100%; padding:8px;">
+                            <option value="breakfast">Завтраки</option>
+                            <option value="salad">Салаты</option>
+                            <option value="soup">Супы</option>
+                            <option value="cold">Холодные закуски</option>
+                            <option value="hot_snack">Горячие закуски</option>
+                            <option value="pasta">Паста</option>
+                            <option value="pizza">Пицца</option>
+                            <option value="burger">Бургеры и Сэндвичи</option>
+                            <option value="main">Основные блюда</option>
+                            <option value="coffee">Кофе</option>
+                            <option value="tea">Чайная карта</option>
+                            <option value="soft_drink">Безалкогольные напитки</option>
+                            <option value="beer">Пиво</option>
+                            <option value="lemonade">Лимонады</option>
+                            <option value="cocktail">Алкогольные коктейли</option>
+                            <option value="alcohol">Крепкий алкоголь</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px;">Цена (₽)</label>
+                        <input type="number" id="addMenuPrice" class="status-select" style="width:100%; padding:8px;" placeholder="350">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px;">Описание (необяз.)</label>
+                        <input type="text" id="addMenuDesc" class="status-select" style="width:100%; padding:8px;" placeholder="Краткое описание">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px;">URL Фото (необяз.)</label>
+                        <input type="text" id="addMenuImage" class="status-select" style="width:100%; padding:8px;" placeholder="./photo/name.jpg">
+                    </div>
+                    <button class="button" onclick="createMenuItem()" style="padding: 10px;">Добавить</button>
+                </div>
+            </div>
+
+            <table class="admin-table">
+                <thead><tr><th>Название</th><th>Категория</th><th>Цена (₽)</th><th>В наличии</th><th>Действия</th></tr></thead>
+                <tbody id="menuBody"></tbody>
+            </table>
+        </div>
+
+        <div id="messagesTab" class="tab-content" style="display: none;">
+            <table class="admin-table">
+                <thead><tr><th>Дата</th><th>Отправитель</th><th>Сообщение</th></tr></thead>
+                <tbody id="messagesBody"></tbody>
+            </table>
+        </div>
+
+        <div id="jobsTab" class="tab-content" style="display: none;">
+            <div style="margin-bottom: 12px; display: flex; justify-content: flex-end;">
+                <button class="button" onclick="exportData('applications')" style="padding: 8px 16px; font-size: 14px;">📊 Экспорт в Excel</button>
+            </div>
+            <table class="admin-table">
+                <thead><tr><th>Дата</th><th>Соискатель</th><th>Должность</th><th>Опыт</th><th>Статус решения</th></tr></thead>
+                <tbody id="jobsBody"></tbody>
+            </table>
+        </div>
+
+        <div id="logsTab" class="tab-content" style="display: none;">
+            <table class="admin-table">
+                <thead><tr><th>Дата</th><th>Кто</th><th>Действие</th><th>Детали</th></tr></thead>
+                <tbody id="logsBody"></tbody>
+            </table>
+        </div>
+
+        <div id="notifyTab" class="tab-content" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <!-- Форма создания -->
+                <div class="stat-card" style="text-align: left;">
+                    <h3 style="margin-bottom: 16px;">Конструктор массовой рассылки</h3>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Тема письма (Subject)</label>
+                            <input type="text" id="bulkSubject" placeholder="Напр: Обновление меню в АэроКафе!" class="status-select" style="width: 100%; padding: 10px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Заголовок в тексте (Title)</label>
+                            <input type="text" id="bulkTitle" placeholder="Напр: Счастливые часы: скидка 20%" class="status-select" style="width: 100%; padding: 10px;" oninput="updatePreview()">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Сообщение</label>
+                            <textarea id="bulkMsg" placeholder="Текст вашего сообщения..." class="status-select" style="width: 100%; padding: 10px; min-height: 120px;" oninput="updatePreview()"></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Текст кнопки (необяз.)</label>
+                                <input type="text" id="bulkBtnText" placeholder="Заказать сейчас" class="status-select" style="width: 100%; padding: 10px;" oninput="updatePreview()">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Ссылка кнопки</label>
+                                <input type="text" id="bulkBtnUrl" placeholder="https://..." class="status-select" style="width: 100%; padding: 10px;" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <button class="button" onclick="sendBulkNotification()" id="sendBulkBtn">Запустить рассылку по всей базе</button>
+                        <p id="bulkStatus" style="font-size: 13px; text-align: center;"></p>
+                    </div>
+                </div>
+
+                <!-- Предпросмотр -->
+                <div class="stat-card" style="text-align: left; background: #f4f4f4; color: #333;">
+                    <h3 style="margin-bottom: 16px; color: #666;">Предпросмотр письма</h3>
+                    <div id="emailPreview" style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; min-height: 300px;">
+                        <div style="background: #003366; padding: 15px; text-align: center; color: #87ceeb; font-weight: bold; font-size: 18px;">АэроКафе</div>
+                        <div style="padding: 20px;">
+                            <h2 id="previewTitle" style="margin-top: 0; color: #003366;">Заголовок</h2>
+                            <p id="previewText" style="white-space: pre-wrap;">Ваше сообщение появится здесь...</p>
+                            <div id="previewBtnContainer" style="text-align: center; margin-top: 20px; display: none;">
+                                <span id="previewBtn" style="background: #87ceeb; color: #003366; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;">Кнопка</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border);">
+
+            <div class="stat-card" style="max-width: 500px; margin: 0 auto; text-align: left;">
+                <h3 style="margin-bottom: 16px;">Личное уведомление (через БД)</h3>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Email пользователя</label>
+                        <input type="email" id="notifyEmail" placeholder="user@example.com" class="status-select" style="width: 100%; padding: 10px; font-size: 14px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; margin-bottom: 4px; color: var(--muted);">Сообщение</label>
+                        <textarea id="notifyMsg" placeholder="Текст сообщения..." class="status-select" style="width: 100%; padding: 10px; font-size: 14px; min-height: 100px;"></textarea>
+                    </div>
+                    <button class="button" onclick="sendNotification()">Отправить в личный кабинет</button>
+                    <p id="notifyStatus" style="font-size: 13px; text-align: center;"></p>
+                </div>
+            </div>
+        </div>
+	</main>
+
+	<script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/auth.html';
+
+        async function fetchSettings() {
+            try {
+                const res = await fetch('/api/admin/settings', { headers: { 'Authorization': `Bearer ${token}` } });
+                const settings = await res.json();
+                settings.forEach(s => {
+                    const el = document.getElementById(`set_${s.key}`);
+                    if (el) el.value = s.value;
+                });
+            } catch (e) { console.error('Ошибка загрузки настроек'); }
+        }
+
+        async function saveAllSettings() {
+            const keys = ['yandex_api_key', 'contact_phone', 'admin_email', 'wait_time'];
+            const statusEl = document.getElementById('settingsStatus');
+            
+            try {
+                statusEl.style.color = 'var(--brand)';
+                statusEl.textContent = 'Сохранение...';
+                
+                for (const key of keys) {
+                    const val = document.getElementById(`set_${key}`).value;
+                    await fetch('/api/admin/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ key, value: val })
+                    });
+                }
+                
+                statusEl.style.color = '#22c55e';
+                statusEl.textContent = '✅ Все настройки успешно сохранены!';
+                setTimeout(() => statusEl.textContent = '', 3000);
+            } catch (e) {
+                statusEl.style.color = '#ef4444';
+                statusEl.textContent = '❌ Ошибка при сохранении';
+            }
+        }
+
+        function showTab(name) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            const target = document.getElementById(name + 'Tab');
+            if (target) target.style.display = 'block';
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+
+            if (name === 'messages') fetchMessages();
+            if (name === 'jobs') fetchJobs();
+            if (name === 'menu') fetchMenu();
+            if (name === 'users') fetchUsers();
+            if (name === 'logs') fetchLogs();
+            if (name === 'settings') fetchSettings();
+        }
+
+        async function fetchUsers() {
+            const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
+            const users = await res.json();
+            document.getElementById('usersBody').innerHTML = users.map(u => `
+                <tr style="${u.isBlocked ? 'opacity: 0.6; background: rgba(239, 68, 68, 0.05);' : ''}">
+                    <td>
+                        <strong>${u.name}</strong> ${u.isBlocked ? ' <span style="color:#ef4444; font-size:10px;">[ЗАБЛОКИРОВАН]</span>' : ''}<br>
+                        <small style="color:var(--muted)">${u.email}</small>
+                    </td>
+                    <td>${u.phone || '—'}</td>
+                    <td>
+                        <select onchange="updateUserRole('${u.id}', this.value)" class="status-select">
+                            <option value="user" ${u.role === 'user' ? 'selected' : ''}>Клиент</option>
+                            <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Админ</option>
+                        </select>
+                    </td>
+                    <td><small>${new Date(u.createdAt).toLocaleDateString()}</small></td>
+                    <td>${u.ordersCount || 0}</td>
+                    <td style="color:var(--brand); font-weight:700">${Math.round(u.totalSpent || 0)} ₽</td>
+                    <td>
+                        <button onclick="toggleBlockUser('${u.id}', ${!u.isBlocked})" class="button" style="padding: 4px 8px; font-size: 10px; background: ${u.isBlocked ? '#22c55e' : '#ef4444'}">
+                            ${u.isBlocked ? 'Разблокировать' : 'Заблокировать'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function toggleBlockUser(id, isBlocked) {
+            const action = isBlocked ? 'заблокировать' : 'разблокировать';
+            if (!confirm(`Вы уверены, что хотите ${action} пользователя?`)) return;
+            
+            await fetch(`/api/admin/users/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ isBlocked })
+            });
+            fetchUsers();
+        }
+
+        async function updateUserRole(id, role) {
+            if (!confirm('Изменить роль пользователя?')) return fetchUsers();
+            await fetch(`/api/admin/users/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ role })
+            });
+            fetchUsers();
+        }
+
+        async function exportData(type) {
+            const res = await fetch(`/api/admin/export/${type}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${type}_${new Date().toISOString().slice(0,10)}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+
+        const categoryMapping = {
+            'breakfast': 'Завтраки',
+            'salad': 'Салаты',
+            'soup': 'Супы',
+            'cold': 'Холодные закуски',
+            'hot_snack': 'Горячие закуски',
+            'pasta': 'Паста',
+            'pizza': 'Пицца',
+            'burger': 'Бургеры и Сэндвичи',
+            'main': 'Основные блюда',
+            'coffee': 'Кофе',
+            'tea': 'Чайная карта',
+            'soft_drink': 'Безалкогольные',
+            'beer': 'Пиво',
+            'lemonade': 'Лимонады',
+            'cocktail': 'Коктейли',
+            'alcohol': 'Крепкий алкоголь'
+        };
+
+        async function createMenuItem() {
+            const name = document.getElementById('addMenuName').value;
+            const category = document.getElementById('addMenuCategory').value;
+            const price = document.getElementById('addMenuPrice').value;
+            const description = document.getElementById('addMenuDesc').value;
+            const image = document.getElementById('addMenuImage').value;
+
+            if (!name || !price) return alert('Название и цена обязательны');
+
+            const res = await fetch('/api/admin/menu', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ name, category, price, description, image })
+            });
+
+            if (res.ok) {
+                document.getElementById('addMenuName').value = '';
+                document.getElementById('addMenuPrice').value = '';
+                document.getElementById('addMenuDesc').value = '';
+                document.getElementById('addMenuImage').value = '';
+                fetchMenu();
+            } else {
+                alert('Ошибка при добавлении');
+            }
+        }
+
+        async function fetchMenu() {
+            const res = await fetch('/api/admin/menu', { headers: { 'Authorization': `Bearer ${token}` } });
+            const items = await res.json();
+            document.getElementById('menuBody').innerHTML = items.map(i => `
+                <tr>
+                    <td>
+                        <input type="text" value="${i.name}" onchange="updateMenuItem('${i.id}', 'name', this.value)" class="status-select" style="width:100%; font-weight:700;">
+                        <input type="text" value="${i.image || ''}" onchange="updateMenuItem('${i.id}', 'image', this.value)" class="status-select" style="width:100%; font-size:10px; margin-top:4px;" placeholder="Путь к фото">
+                    </td>
+                    <td>
+                        <select onchange="updateMenuItem('${i.id}', 'category', this.value)" class="status-select">
+                            ${Object.keys(categoryMapping).map(cat => `<option value="${cat}" ${i.category === cat ? 'selected' : ''}>${categoryMapping[cat]}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td><input type="number" value="${i.price}" onchange="updateMenuItem('${i.id}', 'price', this.value)" class="status-select" style="width:80px"></td>
+                    <td>
+                        <select onchange="updateMenuItem('${i.id}', 'available', this.value === 'true')" class="status-select">
+                            <option value="true" ${i.available?'selected':''}>Да</option>
+                            <option value="false" ${!i.available?'selected':''}>НЕТ (Стоп-лист)</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button onclick="deleteMenuItem('${i.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer;">Удалить</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function updateMenuItem(id, field, value) {
+            await fetch(`/api/admin/menu/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ [field]: value })
+            });
+            fetchMenu();
+        }
+
+        async function deleteMenuItem(id) {
+            if (!confirm('Удалить блюдо?')) return;
+            await fetch(`/api/admin/menu/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            fetchMenu();
+        }
+
+        async function fetchLogs() {
+            const res = await fetch('/api/admin/logs', { headers: { 'Authorization': `Bearer ${token}` } });
+            const logs = await res.json();
+            document.getElementById('logsBody').innerHTML = logs.map(l => `
+                <tr>
+                    <td><small>${new Date(l.createdAt).toLocaleString()}</small></td>
+                    <td><strong>${l.userName || 'Система'}</strong></td>
+                    <td><span class="position-badge">${l.action}</span></td>
+                    <td><small>${l.details || ''}</small></td>
+                </tr>
+            `).join('');
+        }
+
+        async function sendNotification() {
+            const email = document.getElementById('notifyEmail').value;
+            const message = document.getElementById('notifyMsg').value;
+            const statusEl = document.getElementById('notifyStatus');
+
+            if (!email || !message) return alert('Заполните все поля');
+
+            try {
+                statusEl.textContent = 'Поиск пользователя...';
+                const userRes = await fetch(`/api/admin/users/find?email=${email}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!userRes.ok) throw new Error('Пользователь не найден');
+                const user = await userRes.json();
+
+                statusEl.textContent = 'Отправка...';
+                const notifyRes = await fetch('/api/admin/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ userId: user.id, message })
+                });
+
+                if (notifyRes.ok) {
+                    statusEl.style.color = '#22c55e';
+                    statusEl.textContent = 'Уведомление успешно отправлено!';
+                    document.getElementById('notifyMsg').value = '';
+                } else {
+                    throw new Error('Ошибка при отправке');
+                }
+            } catch (err) {
+                statusEl.style.color = '#ef4444';
+                statusEl.textContent = err.message;
+            }
+        }
+
+        function updatePreview() {
+            document.getElementById('previewTitle').textContent = document.getElementById('bulkTitle').value || 'Заголовок';
+            document.getElementById('previewText').textContent = document.getElementById('bulkMsg').value || 'Ваше сообщение появится здесь...';
+            
+            const btnText = document.getElementById('bulkBtnText').value;
+            const btnCont = document.getElementById('previewBtnContainer');
+            const previewBtn = document.getElementById('previewBtn');
+            
+            if (btnText) {
+                btnCont.style.display = 'block';
+                previewBtn.textContent = btnText;
+            } else {
+                btnCont.style.display = 'none';
+            }
+        }
+
+        async function sendBulkNotification() {
+            const subject = document.getElementById('bulkSubject').value;
+            const title = document.getElementById('bulkTitle').value;
+            const message = document.getElementById('bulkMsg').value;
+            const buttonText = document.getElementById('bulkBtnText').value;
+            const buttonUrl = document.getElementById('bulkBtnUrl').value;
+            const statusEl = document.getElementById('bulkStatus');
+            const btn = document.getElementById('sendBulkBtn');
+
+            if (!subject || !title || !message) return alert('Заполните обязательные поля: Тема, Заголовок и Сообщение');
+            
+            if (!confirm(`Вы действительно хотите отправить это письмо ВСЕМ пользователям (${document.getElementById('statUsers').textContent} чел.)?`)) return;
+
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Отправка...';
+                statusEl.style.color = 'var(--brand)';
+                statusEl.textContent = 'Рассылка запущена, пожалуйста подождите...';
+
+                const res = await fetch('/api/admin/notify/bulk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ subject, title, message, buttonText, buttonUrl })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    statusEl.style.color = '#22c55e';
+                    statusEl.textContent = '✅ ' + data.message;
+                } else {
+                    throw new Error(data.message || 'Ошибка сервера');
+                }
+            } catch (err) {
+                statusEl.style.color = '#ef4444';
+                statusEl.textContent = '❌ ' + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Запустить рассылку по всей базе';
+            }
+        }
+
+        async function fetchStats() {
+            const res = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            document.getElementById('statRevenue').textContent = `${data.totalRevenue} ₽`;
+            document.getElementById('statOrders').textContent = data.ordersCount;
+            document.getElementById('statBookings').textContent = data.bookingsCount;
+            document.getElementById('statUsers').textContent = data.usersCount;
+        }
+
+        async function fetchOrders() {
+            const res = await fetch('/api/admin/orders', { headers: { 'Authorization': `Bearer ${token}` } });
+            const orders = await res.json();
+            document.getElementById('ordersBody').innerHTML = orders.map(o => `
+                <tr>
+                    <td>#${o.id.slice(0,6)}<br><small>${new Date(o.createdAt).toLocaleString()}</small></td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            ${o.items.map((item, idx) => `
+                                <div style="display: flex; justify-content: space-between; gap:20px; align-items: center; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 8px;">
+                                    <span>${item.name} x${item.count}</span>
+                                    <select onchange="updateItemStatus('${o.id}', ${idx}, this.value)" class="status-select">
+                                        <option value="pending" ${item.status==='pending'?'selected':''}>Принят</option>
+                                        <option value="cooking" ${item.status==='cooking'?'selected':''}>Готовится</option>
+                                        <option value="ready" ${item.status==='ready'?'selected':''}>Готов</option>
+                                        <option value="delivered" ${item.status==='delivered'?'selected':''}>Выдан</option>
+                                    </select>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </td>
+                    <td><strong>${o.totalAmount} ₽</strong></td>
+                </tr>
+            `).join('');
+        }
+
+        async function fetchMessages() {
+            const res = await fetch('/api/admin/messages', { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            document.getElementById('messagesBody').innerHTML = data.map(m => `
+                <tr>
+                    <td>${new Date(m.createdAt).toLocaleString()}</td>
+                    <td><strong>${m.name}</strong><br><small>${m.contact}</small></td>
+                    <td>${m.message}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function fetchJobs() {
+            const res = await fetch('/api/admin/applications', { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            document.getElementById('jobsBody').innerHTML = data.map(j => `
+                <tr class="job-status-${j.status}">
+                    <td>${new Date(j.createdAt).toLocaleString()}</td>
+                    <td><strong>${j.name}</strong><br><small>${j.phone}<br>${j.email}</small></td>
+                    <td><span class="position-badge">${j.position}</span></td>
+                    <td><small>${j.experience || 'Без опыта'}</small></td>
+                    <td>
+                        <select onchange="updateJobStatus('${j.id}', this.value)" class="status-select">
+                            <option value="pending" ${j.status==='pending'?'selected':''}>⏳ Ожидает решения</option>
+                            <option value="interviewing" ${j.status==='interviewing'?'selected':''}>🗣️ Собеседование</option>
+                            <option value="hired" ${j.status==='hired'?'selected':''}>✅ Принят</option>
+                            <option value="rejected" ${j.status==='rejected'?'selected':''}>❌ Отклонено</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function updateJobStatus(id, status) {
+            await fetch(`/api/admin/applications/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ status })
+            });
+            fetchJobs();
+        }
+
+        async function updateItemStatus(orderId, itemIndex, status) {
+            await fetch(`/api/admin/orders/${orderId}/item-status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ itemIndex, status })
+            });
+            fetchOrders();
+        }
+
+        async function fetchBookings() {
+            const res = await fetch('/api/admin/bookings', { headers: { 'Authorization': `Bearer ${token}` } });
+            const bookings = await res.json();
+            document.getElementById('bookingsBody').innerHTML = bookings.map(b => `
+                <tr>
+                    <td>${b.date} ${b.time}</td>
+                    <td>${b.cafe}</td>
+                    <td>${b.name}<br><small>${b.phone}</small></td>
+                    <td>${b.status}</td>
+                </tr>
+            `).join('');
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '/auth.html'; }
+
+        fetchStats();
+        fetchOrders();
+        fetchBookings();
+        setInterval(() => { fetchStats(); fetchOrders(); }, 10000);
+    </script>
+</body>
+</html>

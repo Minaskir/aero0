@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Кафе Какаду — в аэропорту</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/styles.css">
+	<link rel="stylesheet" href="../css/animations.css">
+</head>
+<body>
+	<header class="site-header">
+		<div class="container header-inner">
+			<a class="logo" href="../index.html">АэроКафе</a>
+			<nav class="nav">
+				<button class="nav-toggle" aria-label="Меню">☰</button>
+				<ul class="nav-list">
+                    <!-- Заполняется динамически -->
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<section class="header-cover">
+		<div class="container">
+			<h1 class="title">Какаду</h1>
+			<p class="subtitle">Семейное кафе с австралийским настроением</p>
+		</div>
+	</section>
+
+	<main class="container cafe-content">
+		<div class="cafe-grid">
+			<img class="cafe-photo" src="../photo/kakadu.jpg" alt="Кафе Какаду">
+			<div class="info">
+				<h3>О кафе</h3>
+				<p>«Какаду» — непринуждённая атмосфера, блюда с австралийскими нотами и детское меню. Отличный выбор для путешествий всей семьёй.</p>
+				<h3>Контакты</h3>
+				<div class="kv">
+					<div>Телефон</div><div><a href="tel:+79876002900">+7 (987) 600-29-00</a></div>
+					<div>Менеджер</div><div>Ежедневно 09:00–18:00</div>
+				</div>
+				<h3>Меню</h3>
+				<div class="cafe-menu-grid">
+					<div>
+						<div class="cafe-menu-section">
+							<h4>Бургеры и сендвичи</h4>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Фишбургер</div>
+								<div class="cafe-item-price">890 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Клаб сендвич</div>
+								<div class="cafe-item-price">950 ₽</div>
+							</div>
+						</div>
+					</div>
+					
+					<div>
+						<div class="cafe-menu-section">
+							<h4>Горячие блюда</h4>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Стейк филе-миньон с овощами гриль</div>
+								<div class="cafe-item-price">1750 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Лосось с соусом из печеных овощей</div>
+								<div class="cafe-item-price">1650 ₽</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<h3>Инфо</h3>
+				<div class="kv">
+					<div>Расположение</div><div>Терминал A, 1 этаж, у зоны прилёта</div>
+					<div>Часы работы</div><div>Круглосуточно</div>
+					<div>Предложение</div><div>Бургеры, боулы, кофе, детское меню</div>
+				</div>
+			</div>
+		</div>
+		
+		<section class="booking-section container">
+			<h2>Забронировать стол</h2>
+			<div class="booking-info">
+				<p>Оформите бронь онлайн, и мы свяжемся с вами для подтверждения.</p>
+				<div class="booking-note">
+					<strong>Условие:</strong> Бронь доступна при заказе от 2000 рублей
+				</div>
+			</div>
+			<div class="booking-action">
+				<button type="button" class="button booking-open-btn" data-cafe="Какаду">Забронировать</button>
+			</div>
+		</section>
+	</main>
+
+	<footer class="site-footer">
+		<div class="container">
+			<p>© 2025 АэроКафе</p>
+		</div>
+	</footer>
+	<div id="bookingModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h3>Бронирование столика</h3>
+			<form class="booking-form">
+				<input type="hidden" name="cafe" class="booking-cafe-input" value="Какаду">
+				<label>
+					<span>Имя</span>
+					<input type="text" name="name" required>
+				</label>
+				<label>
+					<span>Телефон</span>
+					<input type="tel" name="phone" placeholder="+7 (___) ___-__-__" 
+						   pattern="^(\+7|8)?[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$" required>
+				</label>
+				<label>
+					<span>Количество гостей</span>
+					<input type="number" name="guests" min="1" max="20" value="1" required>
+				</label>
+				<label>
+					<span>Дата</span>
+					<input type="date" id="booking-date" name="date" required>
+				</label>
+				<label>
+					<span>Время</span>
+					<input type="time" name="time" required>
+				</label>
+				<button type="submit" class="button">Отправить бронь</button>
+			</form>
+		</div>
+	</div>
+
+	<script src="../js/main.js"></script>
+</body>
+</html>

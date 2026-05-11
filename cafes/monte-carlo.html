@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Кафе Монте Карло — в аэропорту</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/styles.css">
+	<link rel="stylesheet" href="../css/animations.css">
+</head>
+<body>
+	<header class="site-header">
+		<div class="container header-inner">
+			<a class="logo" href="../index.html">АэроКафе</a>
+			<nav class="nav">
+				<button class="nav-toggle" aria-label="Меню">☰</button>
+				<ul class="nav-list">
+                    <!-- Заполняется динамически -->
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<section class="header-cover">
+		<div class="container">
+			<h1 class="title">Монте Карло</h1>
+			<p class="subtitle">Европейская кухня и спокойная атмосфера</p>
+		</div>
+	</section>
+
+	<main class="container cafe-content">
+		<div class="cafe-grid">
+			<img class="cafe-photo" src="../photo/monte.jpg" alt="Кафе Монте Карло">
+			<div class="info">
+				<h3>О кафе</h3>
+				<p>«Монте Карло» — место для ценителей европейской кухни. Идеально подойдёт для неспешного обеда или деловой встречи до посадки.</p>
+				<h3>Контакты</h3>
+				<div class="kv">
+					<div>Телефон</div><div><a href="tel:+79876003900">+7 (987) 600-39-00</a></div>
+					<div>Менеджер</div><div>Ежедневно 09:00–18:00</div>
+				</div>
+				<h3>Меню</h3>
+				<div class="cafe-menu-grid">
+					<div>
+						<div class="cafe-menu-section">
+							<h4>Завтраки</h4>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Глазунья с беконом</div>
+								<div class="cafe-item-price">670 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Блинчики с лососем</div>
+								<div class="cafe-item-price">850 ₽</div>
+							</div>
+						</div>
+						
+						<div class="cafe-menu-section">
+							<h4>Холодные закуски</h4>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Мясная тарелка</div>
+								<div class="cafe-item-price">980 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Ассорти сыров</div>
+								<div class="cafe-item-price">1150 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Лосось на губернском тосте</div>
+								<div class="cafe-item-price">890 ₽</div>
+							</div>
+						</div>
+					</div>
+					
+					<div>
+						<div class="cafe-menu-section">
+							<h4>Паста</h4>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Фетучини с креветками</div>
+								<div class="cafe-item-price">1060 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Карбонара</div>
+								<div class="cafe-item-price">980 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Фетучини в сливочном соусе</div>
+								<div class="cafe-item-price">770 ₽</div>
+							</div>
+						</div>
+						
+						<div class="cafe-menu-section">
+							<h4>Супы</h4>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Грибной крем-суп</div>
+								<div class="cafe-item-price">590 ₽</div>
+							</div>
+							<div class="cafe-menu-item">
+								<div class="cafe-item-name">Солянка</div>
+								<div class="cafe-item-price">650 ₽</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<h3>Инфо</h3>
+				<div class="kv">
+					<div>Расположение</div><div>Терминал A, 3 этаж, бизнес-зона</div>
+					<div>Часы работы</div><div>Круглосуточно</div>
+					<div>Предложение</div><div>Горячие блюда, салаты, десерты, вино</div>
+				</div>
+			</div>
+		</div>
+		
+		<section class="booking-section container">
+			<h2>Забронировать стол</h2>
+			<div class="booking-info">
+				<p>Оформите бронь онлайн, и мы свяжемся с вами для подтверждения.</p>
+				<div class="booking-note">
+					<strong>Условие:</strong> Бронь доступна при заказе от 2000 рублей
+				</div>
+			</div>
+			<div class="booking-action">
+				<button type="button" class="button booking-open-btn" data-cafe="Монте Карло">Забронировать</button>
+			</div>
+		</section>
+	</main>
+
+	<footer class="site-footer">
+		<div class="container">
+			<p>© 2025 АэроКафе</p>
+		</div>
+	</footer>
+	<div id="bookingModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h3>Бронирование столика</h3>
+			<form class="booking-form">
+				<input type="hidden" name="cafe" class="booking-cafe-input" value="Монте Карло">
+				<label>
+					<span>Имя</span>
+					<input type="text" name="name" required>
+				</label>
+				<label>
+					<span>Телефон</span>
+					<input type="tel" name="phone" required>
+				</label>
+				<label>
+					<span>Количество гостей</span>
+					<input type="number" name="guests" min="1" required>
+				</label>
+				<label>
+					<span>Дата</span>
+					<input type="date" name="date" required>
+				</label>
+				<label>
+					<span>Время</span>
+					<input type="time" name="time" required>
+				</label>
+				<button type="submit" class="button">Отправить бронь</button>
+			</form>
+		</div>
+	</div>
+
+	<script src="../js/main.js"></script>
+</body>
+</html>

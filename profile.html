@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Личный кабинет — АэроКафе</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="./css/styles.css">
+	<link rel="stylesheet" href="./css/animations.css">
+    <style>
+        .profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 32px; padding: 40px 0; }
+        .profile-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; height: fit-content; }
+        .profile-avatar { width: 80px; height: 80px; background: var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #0c111c; margin: 0 auto 16px; }
+        .order-history { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 32px; }
+        .order-item { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+        .order-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
+        .order-items-list { list-style: none; padding: 0; }
+        
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+        .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .status-pending { background: #64748b; color: white; }
+        .status-cooking { background: #f59e0b; color: white; }
+        .status-ready { background: #22c55e; color: white; }
+        .status-delivered { background: #3b82f6; color: white; }
+
+        .logout-btn { width: 100%; margin-top: 24px; background: transparent; color: #ef4444; border: 1px solid #ef4444; }
+        .logout-btn:hover { background: #ef4444; color: white; }
+
+        .profile-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .profile-input:focus {
+            border-color: var(--brand);
+            outline: none;
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+	<header class="site-header">
+		<div class="container header-inner">
+			<a class="logo" href="/">АэроКафе</a>
+            <nav class="nav">
+                <button class="nav-toggle" aria-label="Меню">☰</button>
+				<ul class="nav-list">
+                    <!-- Заполняется динамически -->
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<main class="container profile-grid">
+		<aside class="profile-card">
+			<div class="profile-avatar" id="avatarLetter">?</div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Ваше имя</label>
+                <input type="text" id="editName" class="profile-input" style="width: 100%; margin-bottom: 12px;">
+                
+                <label style="display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px;">Телефон</label>
+                <input type="text" id="editPhone" class="profile-input" placeholder="89001234567" style="width: 100%; margin-bottom: 16px;">
+                
+                <button onclick="updateProfile()" class="button w-100" style="padding: 10px;">Сохранить изменения</button>
+            </div>
+			<p id="profileEmail" style="text-align: center; color: var(--muted); font-size: 14px; margin-top: 20px;"></p>
+            <button onclick="logout()" class="button logout-btn">Выйти</button>
+		</aside>
+
+		<section class="order-history">
+            <div id="notificationsBlock" style="display: none; margin-bottom: 40px;">
+                <h2 style="color: var(--brand); margin-bottom: 16px;">Уведомления</h2>
+                <div id="notificationsList"></div>
+            </div>
+
+            <div id="bookingsBlock" style="margin-bottom: 40px;">
+                <h2>Мои бронирования</h2>
+                <div id="bookingsList"></div>
+            </div>
+
+			<h2>Мои заказы</h2>
+            <p style="color: var(--muted); font-size: 14px; margin-bottom: 24px;">Статусы блюд обновляются в режиме реального времени</p>
+			<div id="ordersList"></div>
+		</section>
+	</main>
+
+	<script src="./js/main.js"></script>
+	<script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/auth.html';
+
+        async function loadData() {
+            try {
+                // Загрузка профиля
+                const profileRes = await fetch('/api/user/profile', { headers: { 'Authorization': `Bearer ${token}` } });
+                const user = await profileRes.json();
+                
+                document.getElementById('editName').value = user.name;
+                document.getElementById('editPhone').value = user.phone || '';
+                document.getElementById('profileEmail').textContent = user.email;
+                document.getElementById('avatarLetter').textContent = user.name ? user.name[0].toUpperCase() : '?';
+
+                // Загрузка заказов
+                const ordersRes = await fetch('/api/user/orders', { headers: { 'Authorization': `Bearer ${token}` } });
+                const orders = await ordersRes.json();
+                renderOrders(orders);
+
+                // Загрузка уведомлений
+                const notifyRes = await fetch('/api/user/notifications', { headers: { 'Authorization': `Bearer ${token}` } });
+                const notifications = await notifyRes.json();
+                renderNotifications(notifications);
+
+                // Загрузка бронирований
+                const bookingsRes = await fetch('/api/user/bookings', { headers: { 'Authorization': `Bearer ${token}` } });
+                const bookings = await bookingsRes.json();
+                renderBookings(bookings);
+            } catch (err) { console.error(err); }
+        }
+
+        async function updateProfile() {
+            const name = document.getElementById('editName').value;
+            const phone = document.getElementById('editPhone').value;
+
+            if (!name) {
+                showNotification('Имя не может быть пустым', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/user/profile', {
+                    method: 'PATCH',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, phone })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('userName', data.name);
+                    document.getElementById('avatarLetter').textContent = data.name[0].toUpperCase();
+                    showNotification('Профиль успешно обновлен', 'success');
+                    if (window.syncNavigation) window.syncNavigation();
+                } else {
+                    showNotification('Ошибка при обновлении профиля', 'error');
+                }
+            } catch (err) {
+                showNotification('Ошибка связи с сервером', 'error');
+            }
+        }
+
+        function renderBookings(items) {
+            const list = document.getElementById('bookingsList');
+            if (items.length === 0) {
+                list.innerHTML = '<p style="color: var(--muted); font-size: 14px;">У вас пока нет активных бронирований</p>';
+                return;
+            }
+
+            const bookingStatusMap = {
+                'pending': 'Ожидает подтверждения',
+                'confirmed': 'Подтверждено',
+                'cancelled': 'Отменено'
+            };
+
+            list.innerHTML = items.map(b => `
+                <div class="order-item" style="border-left: 4px solid ${b.status==='confirmed'?'#22c55e':b.status==='cancelled'?'#ef4444':'#f59e0b'}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <div style="font-weight: 700; margin-bottom: 4px;">Кафе «${b.cafe}»</div>
+                            <div style="font-size: 14px; color: var(--muted);">${b.date} в ${b.time}</div>
+                            <div style="font-size: 13px; margin-top: 4px;">Гостей: ${b.guests}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="status-pill status-${b.status}">${bookingStatusMap[b.status]}</span>
+                            ${b.status === 'pending' || b.status === 'confirmed' ? `
+                                <div style="margin-top: 12px;">
+                                    <button onclick="cancelBooking('${b.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size: 12px; text-decoration: underline;">Отменить</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function cancelBooking(id) {
+            if (!confirm('Вы уверены, что хотите отменить бронирование?')) return;
+            try {
+                const res = await fetch(`/api/user/bookings/${id}/cancel`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    showNotification('Бронирование успешно отменено', 'success');
+                    loadData();
+                } else {
+                    showNotification('Не удалось отменить бронирование', 'error');
+                }
+            } catch (err) { showNotification('Ошибка сервера', 'error'); }
+        }
+
+        function renderNotifications(items) {
+            const block = document.getElementById('notificationsBlock');
+            const list = document.getElementById('notificationsList');
+            if (items.length === 0) {
+                block.style.display = 'none';
+                return;
+            }
+
+            block.style.display = 'block';
+            list.innerHTML = items.map(n => `
+                <div style="background: rgba(135,206,235,0.05); border: 1px solid var(--brand); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                    <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">${new Date(n.createdAt).toLocaleString()}</div>
+                    <div style="font-size: 14px;">${n.message}</div>
+                </div>
+            `).join('');
+        }
+
+        const statusMap = {
+            'pending': 'Принят',
+            'cooking': 'Готовится',
+            'ready': 'Готов к выдаче',
+            'delivered': 'Выдан'
+        };
+
+        function renderOrders(orders) {
+            const list = document.getElementById('ordersList');
+            if (orders.length === 0) {
+                list.innerHTML = '<p style="color: var(--muted)">Заказов пока нет</p>';
+                return;
+            }
+
+            list.innerHTML = orders.map(order => `
+                <div class="order-item">
+                    <div class="order-header">
+                        <div><strong>Заказ #${order.id.slice(0,6)}</strong></div>
+                        <div style="font-weight: 700; color: var(--brand)">${order.totalAmount} ₽</div>
+                    </div>
+                    <div class="order-items-list">
+                        ${order.items.map(item => `
+                            <div class="item-row">
+                                <div>
+                                    <span>${item.name}</span>
+                                    <small style="color: var(--muted); margin-left: 8px;">x${item.count}</small>
+                                </div>
+                                <span class="status-pill status-${item.status}">${statusMap[item.status]}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function logout() { 
+            showNotification('Вы вышли из системы', 'info');
+            localStorage.clear(); 
+            setTimeout(() => { window.location.href = '/'; }, 1000);
+        }
+
+        loadData();
+        // Авто-обновление каждые 10 секунд
+        setInterval(loadData, 10000);
+    </script>
+</body>
+</html>
+
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Кафе в аэропорту — Манго, Монте Карло, Какаду</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="./css/styles.css">
+	<link rel="stylesheet" href="./css/animations.css">
+	<meta name="description" content="Сеть из трех кафе в аэропорту: Манго, Монте Карло и Какаду. Меню, расположение, часы работы и контакты.">
+</head>
+<body>
+	<header class="site-header">
+		<div class="container header-inner">
+			<a class="logo" href="/">АэроКафе</a>
+			<nav class="nav">
+				<button class="nav-toggle" aria-label="Меню">☰</button>
+				<ul class="nav-list">
+					<li><a href="/">Главная</a></li>
+					<li><a href="./cafes/mango.html">Манго</a></li>
+					<li><a href="./cafes/monte-carlo.html">Монте Карло</a></li>
+					<li><a href="./cafes/kakadu.html">Какаду</a></li>
+					<li><a href="./menu.html">Меню</a></li>
+					<li><a href="./contacts.html">Контакты</a></li>
+                    <li class="nav-auth-group">
+                        <a href="./auth.html" id="navAuthBtn" class="nav-auth-link primary">Войти / Регистрация</a>
+                    </li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<main>
+		<section class="hero reveal">
+			<div class="container">
+				<div class="hero-content">
+					<h1>Добро пожаловать в аэропорт и наши кафе</h1>
+					<p class="lead">Три уютных кафе в одном терминале: свежий кофе, быстрые перекусы и приятная атмосфера перед полетом.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="about container reveal">
+			<h2>Об аэропорте</h2>
+			<p>Наш аэропорт — современный терминал с удобной навигацией, бесплатным Wi‑Fi и широким выбором услуг для пассажиров. Мы расположены в шаговой доступности от зоны вылета и прилета.</p>
+		</section>
+
+		<section class="services container reveal">
+			<h2 style="text-align: center; margin-bottom: 48px;">Сервис для пассажиров</h2>
+			<div class="services-grid">
+				<div class="service-card">
+					<div class="service-visual">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--brand)"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                    </div>
+					<div class="service-body">
+						<h3>Бесплатный Wi-Fi</h3>
+						<p>Высокоскоростной безлимитный интернет во всех зонах терминала REN-Guest.</p>
+					</div>
+				</div>
+				<div class="service-card featured">
+					<div class="service-visual">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--brand)"><rect x="1" y="3" width="22" height="13" rx="2" ry="2"></rect><path d="M7 21h0"></path><path d="M17 21h0"></path><path d="M8 3v13"></path><path d="M16 3v13"></path><path d="M3 13h18"></path></svg>
+                    </div>
+					<div class="service-body">
+						<h3>Умная Парковка</h3>
+						<p>Круглосуточный мониторинг, первые 15 минут бесплатно, удобная оплата через QR.</p>
+						<span class="service-badge">Популярно</span>
+					</div>
+				</div>
+				<div class="service-card">
+					<div class="service-visual">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--brand)"><rect x="4" y="4" width="16" height="18" rx="2"></rect><path d="M9 4v10"></path><path d="M15 4v10"></path><path d="M6 20h12"></path></svg>
+                    </div>
+					<div class="service-body">
+						<h3>Камеры хранения</h3>
+						<p>Надежное хранение вашего багажа и ручной клади в автоматических ячейках.</p>
+					</div>
+				</div>
+				<div class="service-card">
+					<div class="service-visual">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--brand)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                    </div>
+					<div class="service-body">
+						<h3>Бизнес-зал</h3>
+						<p>Комфортная зона отдыха, шведский стол и рабочие места для продуктивного ожидания.</p>
+					</div>
+				</div>
+				<div class="service-card">
+					<div class="service-visual">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--brand)"><path d="M21 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v3"></path><path d="M21 16v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3"></path><path d="M4 12h16"></path><rect x="2" y="8" width="20" height="8" rx="2"></rect></svg>
+                    </div>
+					<div class="service-body">
+						<h3>Упаковка багажа</h3>
+						<p>Прочная защита ваших чемоданов специализированной пленкой за 2 минуты.</p>
+					</div>
+				</div>
+				<div class="service-card">
+					<div class="service-visual">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--brand)"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    </div>
+					<div class="service-body">
+						<h3>Медпункт и Аптека</h3>
+						<p>Квалифицированная медицинская помощь 24/7 и широкий выбор медикаментов.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="schedule container reveal">
+			<h2 style="text-align: center; margin-bottom: 40px;">Режим работы</h2>
+			<div class="schedule-grid">
+				<div class="schedule-card main-terminal">
+					<div class="card-icon">🏛️</div>
+					<h3>Терминал A</h3>
+					<div class="status-now"><span class="pulse"></span> Сейчас открыто</div>
+					<ul class="schedule-details">
+						<li><strong>Регистрация:</strong> начинается за 3 часа до вылета</li>
+						<li><strong>Зона вылета:</strong> доступна после прохождения контроля</li>
+						<li><strong>Сервисные зоны:</strong> работают без перерывов</li>
+					</ul>
+				</div>
+				
+				<div class="schedule-card cafes-time">
+					<div class="card-icon">☕</div>
+					<h3>Наши кафе</h3>
+					<div class="status-now"><span class="pulse"></span> Сейчас открыты</div>
+					<div class="cafe-times-list">
+						<div class="cafe-time-item"><span>Манго</span> <strong>24/7</strong></div>
+						<div class="cafe-time-item"><span>Монте Карло</span> <strong>24/7</strong></div>
+						<div class="cafe-time-item"><span>Какаду</span> <strong>24/7</strong></div>
+					</div>
+					<p class="schedule-note">Технические перерывы: 03:00 – 03:15</p>
+				</div>
+			</div>
+		</section>
+
+
+		<section class="flight-board-section container reveal">
+			<div class="board-header">
+				<h2>Табло рейсов: Оренбург (REN)</h2>
+				<div class="board-tabs">
+					<button class="board-tab active" onclick="updateBoard('departure')">Вылет</button>
+					<button class="board-tab" onclick="updateBoard('arrival')">Прилет</button>
+				</div>
+			</div>
+			<div class="flight-board">
+				<div class="board-grid header">
+					<div>Рейс</div>
+					<div>Направление</div>
+					<div>Время</div>
+					<div>Статус</div>
+				</div>
+				<div id="flightsContainer">
+					<!-- Рейсы загрузятся через JS -->
+				</div>
+			</div>
+            <p style="text-align: center; color: var(--muted); font-size: 13px; margin-top: 16px;">
+                * Рекомендуем прибывать в аэропорт за 2 часа до вылета. Наши кафе открыты круглосуточно.
+            </p>
+		</section>
+
+		<section class="cafes-overview container reveal">
+			<h2>Наши кафе</h2>
+			<div class="cafe-grid">
+				<div class="cafe-card">
+					<img class="cafe-photo" src="./photo/mango.jpg" alt="Кафе Манго">			
+					<div class="cafe-info">
+						<h3>Манго</h3>
+						<p style="color: var(--brand); font-weight: 600; font-size: 14px; margin-bottom: 8px;">📍 1 этаж, слева от входа, 1 гейт</p>
+						<p>Яркое кафе со свежими фруктовыми смузи, десертами и лёгкими завтраками. Отличный выбор перед ранним вылетом.</p>
+						<a class="button" href="./cafes/mango.html">Подробнее</a>
+					</div>
+				</div>
+
+				<div class="cafe-card">
+					<img class="cafe-photo" src="./photo/monte.jpg" alt="Кафе Монте Карло">
+					<div class="cafe-info">
+						<h3>Монте Карло</h3>
+						<p style="color: var(--brand); font-weight: 600; font-size: 14px; margin-bottom: 8px;">📍 2 этаж, правое крыло, гейт 3-4</p>
+						<p>Европейская кухня, утончённая подача и спокойная атмосфера. Прекрасно подходит для деловых встреч.</p>
+						<a class="button" href="./cafes/monte-carlo.html">Подробнее</a>
+					</div>
+				</div>
+
+				<div class="cafe-card">
+					<img class="cafe-photo" src="./photo/kakadu.jpg" alt="Кафе Какаду">
+					<div class="cafe-info">
+						<h3>Какаду</h3>
+						<p style="color: var(--brand); font-weight: 600; font-size: 14px; margin-bottom: 8px;">📍 2 этаж, общий зал</p>
+						<p>Непринуждённая атмосфера и блюда с австралийскими нотами. Идеально, чтобы перекусить всей семьёй.</p>
+						<a class="button" href="./cafes/kakadu.html">Подробнее</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="site-footer">
+		<div class="container">
+			<p>© 2025 АэроКафе. Все права защищены.</p>
+		</div>
+	</footer>
+
+    <script src="./js/main.js"></script>
+</body>
+</html>

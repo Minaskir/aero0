@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Меню — АэроКафе</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="./css/styles.css">
+	<link rel="stylesheet" href="./css/animations.css">
+	<meta name="description" content="Полное меню ресторана в аэропорту: завтраки, закуски, салаты, паста, супы, пицца.">
+    <style>
+        .cart-float { position: fixed; bottom: 30px; right: 30px; background: var(--brand); color: #0c111c; padding: 16px 24px; border-radius: 50px; display: flex; align-items: center; gap: 12px; cursor: pointer; box-shadow: 0 8px 32px rgba(135,206,235,0.4); z-index: 1000; font-weight: 700; transition: transform 0.3s ease; }
+        .cart-float:hover { transform: scale(1.05); }
+        .cart-count { background: #0c111c; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        
+        .cart-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .cart-modal.open { display: flex; }
+        .cart-content { background: var(--card); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 500px; padding: 32px; max-height: 90vh; overflow-y: auto; }
+        
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .cart-item-info h4 { font-size: 16px; margin: 0; }
+        .cart-item-controls { display: flex; align-items: center; gap: 12px; }
+        .cart-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; }
+
+        .menu-loading { text-align: center; padding: 40px; color: var(--muted); font-size: 18px; }
+        
+        .search-container { position: relative; margin-bottom: 32px; }
+        .search-input { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 16px; padding: 16px 16px 16px 50px; color: white; font-size: 16px; transition: all 0.3s; backdrop-filter: blur(10px); }
+        .search-input:focus { outline: none; border-color: var(--brand); background: rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(135,206,235,0.1); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); opacity: 0.5; font-size: 18px; }
+
+        .filter-buttons { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 40px; scrollbar-width: none; -ms-overflow-style: none; }
+        .filter-buttons::-webkit-scrollbar { display: none; }
+        .filter-btn { white-space: nowrap; background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text); padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s; backdrop-filter: blur(5px); }
+        .filter-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--brand); }
+        .filter-btn.active { background: var(--brand); color: #0c111c; border-color: var(--brand); font-weight: 700; box-shadow: 0 4px 15px rgba(135,206,235,0.3); }
+    </style>
+</head>
+<body>
+	<header class="site-header">
+		<div class="container header-inner">
+			<a class="logo" href="./index.html">АэроКафе</a>
+			<nav class="nav">
+				<button class="nav-toggle" aria-label="Меню">☰</button>
+				<ul class="nav-list">
+					<li><a href="./index.html">Главная</a></li>
+					<li><a href="./cafes/mango.html">Манго</a></li>
+					<li><a href="./cafes/monte-carlo.html">Монте Карло</a></li>
+					<li><a href="./cafes/kakadu.html">Какаду</a></li>
+					<li><a href="./menu.html">Меню</a></li>
+					<li><a href="./contacts.html">Контакты</a></li>
+                    <li class="nav-auth-group">
+                        <a href="./auth.html" id="navAuthBtn" class="nav-auth-link primary">Войти / Регистрация</a>
+                    </li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<section class="header-cover reveal">
+		<div class="container">
+			<h1 class="title">Меню</h1>
+			<p class="subtitle">Изысканные блюда и напитки для вашего путешествия</p>
+		</div>
+	</section>
+
+	<main class="container cafe-content">
+		<div class="menu-page">
+			
+			<div class="search-container reveal">
+				<span class="search-icon">🔍</span>
+				<input type="text" class="search-input" id="menuSearch" placeholder="Поиск по названию или составу блюда...">
+			</div>
+
+			<div class="filter-buttons reveal">
+				<button class="filter-btn active" data-category="all">Все позиции</button>
+				<button class="filter-btn" data-category="breakfast">Завтраки</button>
+				<button class="filter-btn" data-category="salad">Салаты</button>
+				<button class="filter-btn" data-category="soup">Супы</button>
+				<button class="filter-btn" data-category="cold">Холодные закуски</button>
+				<button class="filter-btn" data-category="hot_snack">Горячие закуски</button>
+				<button class="filter-btn" data-category="pasta">Паста</button>
+				<button class="filter-btn" data-category="pizza">Пицца</button>
+				<button class="filter-btn" data-category="burger">Бургеры</button>
+				<button class="filter-btn" data-category="main">Основные блюда</button>
+				<button class="filter-btn" data-category="coffee">Кофе</button>
+				<button class="filter-btn" data-category="tea">Чай</button>
+				<button class="filter-btn" data-category="soft_drink">Напитки</button>
+				<button class="filter-btn" data-category="beer">Пиво</button>
+				<button class="filter-btn" data-category="lemonade">Лимонады</button>
+				<button class="filter-btn" data-category="cocktail">Коктейли</button>
+				<button class="filter-btn" data-category="alcohol">Алкоголь</button>
+			</div>
+			
+			<div id="menuSectionsContainer">
+                <div class="menu-loading">Подготовка меню...</div>
+            </div>
+		</div>
+	</main>
+
+    <div class="cart-float" onclick="toggleCart()">
+        <span>🛒 Корзина</span>
+        <div class="cart-count" id="cartCount">0</div>
+        <span id="cartTotal">0 ₽</span>
+    </div>
+
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h2 style="margin: 0;">Ваш заказ</h2>
+                <button class="cart-btn" onclick="toggleCart()">✕</button>
+            </div>
+            <div id="cartItemsList"></div>
+            <div style="margin-top: 24px; border-top: 2px solid var(--border); padding-top: 20px;">
+                <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; margin-bottom: 24px;">
+                    <span>Итого:</span>
+                    <span id="cartModalTotal">0 ₽</span>
+                </div>
+                <button class="button w-100" onclick="goToCheckout()" style="height: 50px; font-size: 18px;">Оформить и оплатить</button>
+            </div>
+        </div>
+    </div>
+
+	<footer class="site-footer">
+		<div class="container"><p>© 2025 АэроКафе | Все права защищены.</p></div>
+	</footer>
+
+	<script src="./js/main.js"></script>
+    <script src="./js/cart.js"></script>
+    <script>
+        const categoryNames = {
+            'breakfast': 'Завтраки', 'salad': 'Салаты', 'soup': 'Супы', 'cold': 'Холодные закуски',
+            'hot_snack': 'Горячие закуски', 'pasta': 'Паста', 'pizza': 'Пицца', 'burger': 'Бургеры и Сэндвичи',
+            'main': 'Основные блюда', 'coffee': 'Кофе', 'tea': 'Чайная карта', 'soft_drink': 'Безалкогольные напитки',
+            'beer': 'Пиво', 'lemonade': 'Лимонады', 'cocktail': 'Алкогольные коктейли', 'alcohol': 'Крепкий алкоголь и Вино'
+        };
+
+        const drinkCategories = ['coffee', 'tea', 'soft_drink', 'beer', 'lemonade', 'cocktail', 'alcohol'];
+        let allMenuItems = [];
+
+        async function loadMenu() {
+            try {
+                const res = await fetch('/api/menu');
+                allMenuItems = await res.json();
+                renderMenu(allMenuItems);
+                if (typeof initializeLazyLoading === 'function') {
+                    initializeLazyLoading();
+                }
+            } catch (e) {
+                document.getElementById('menuSectionsContainer').innerHTML = '<div class="menu-loading">Ошибка загрузки меню</div>';
+            }
+        }
+
+        function renderFood(i) {
+            return `
+                <div class="menu-item reveal" data-category="${i.category}">
+                    <div class="menu-item-img-wrapper">
+                        <img data-src="${i.image || 'https://placehold.co/400x400?text=Нет+фото'}" 
+                             src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                             alt="${i.name}" 
+                             class="menu-item-img lazy">
+                    </div>
+                    <div class="menu-item-body">
+                        <div class="item-header">
+                            <h3 class="item-name">${i.name}</h3>
+                            <div class="item-price">${Math.round(i.price)} ₽</div>
+                        </div>
+                        <p class="item-description">${i.description || ''}</p>
+                        <div class="item-footer">
+                            <div class="item-tags">
+                                ${i.calories ? `<span class="calories">${i.calories}</span>` : ''}
+                                ${i.allergens ? `<span class="allergens">${i.allergens}</span>` : ''}
+                            </div>
+                            <button class="button add-to-cart-btn" onclick="addToCart('${i.name}', ${i.price})">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDrink(baseName, variants, first, subLabelHtml) {
+            return subLabelHtml + `
+                <div class="menu-item drink-item reveal" data-category="${first.category}">
+                    <div class="menu-item-body">
+                        <div class="item-header">
+                            <h3 class="item-name">${baseName}</h3>
+                            <div class="item-price" id="price-${first.id.slice(0,8)}">${Math.round(first.price)} ₽</div>
+                        </div>
+                        <p class="item-description">${first.description || ''}</p>
+                        <div class="item-footer">
+                            <select class="variant-select" onchange="updateVariantPrice(this, '${first.id.slice(0,8)}')">
+                                ${variants.map(v => `<option value="${Math.round(v.price)}" data-name="${v.name}">${v.name.match(/\d+\s?мл/)?.[0] || v.name}</option>`).join('')}
+                            </select>
+                            <button class="button add-to-cart-btn" onclick="addVariantToCart(this)">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSingleDrink(item, subLabelHtml) {
+            return subLabelHtml + `
+                <div class="menu-item drink-item reveal" data-category="${item.category}">
+                    <div class="menu-item-body">
+                        <div class="item-header">
+                            <h3 class="item-name">${item.name}</h3>
+                            <div class="item-price">${Math.round(item.price)} ₽</div>
+                        </div>
+                        <p class="item-description">${item.description || ''}</p>
+                        <div class="item-footer">
+                            <span></span>
+                            <button class="button add-to-cart-btn" onclick="addToCart('${item.name}', ${item.price})">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMenu(items) {
+            const container = document.getElementById('menuSectionsContainer');
+            const categories = Object.keys(categoryNames).filter(cat => items.some(i => i.category === cat));
+
+            if (items.length === 0) {
+                container.innerHTML = '<div class="menu-loading">Ничего не найдено</div>';
+                return;
+            }
+
+            container.innerHTML = categories.map(cat => {
+                let catItems = items.filter(i => i.category === cat);
+                const isDrink = drinkCategories.includes(cat);
+                
+                let renderedItemsHtml = '';
+                if (isDrink) {
+                    const groups = {};
+                    catItems.forEach(item => {
+                        let baseName = item.name.replace(/\s\d+\s?мл.*$/, '').trim();
+                        if (!groups[baseName]) groups[baseName] = [];
+                        groups[baseName].push(item);
+                    });
+
+                    let lastSubLabel = '';
+                    renderedItemsHtml = Object.keys(groups).map(baseName => {
+                        const variants = groups[baseName];
+                        const first = variants[0];
+                        let subLabelHtml = '';
+
+                        if (cat === 'alcohol') {
+                            const subGroups = [
+                                { key: 'водка', label: 'Водка' }, { key: 'ackanelis', label: 'Коньяк / Бренди' },
+                                { key: 'aparat', label: 'Коньяк / Бренди' }, { key: 'boduen', label: 'Коньяк / Бренди' },
+                                { key: 'merlet', label: 'Коньяк / Бренди' }, { key: 'martell', label: 'Коньяк / Бренди' },
+                                { key: 'courvoisier', label: 'Коньяк / Бренди' }, { key: 'havana', label: 'Ром' },
+                                { key: 'oimeca', label: 'Текила' }, { key: 'gold 1598', label: 'Текила' },
+                                { key: 'montevi', label: 'Игристое вино' }, { key: ' rising', label: 'Белое вино' },
+                                { key: 'pinot', label: 'Белое вино' }, { key: 'киндзмараули', label: 'Красное вино' },
+                                { key: 'montepulciano', label: 'Красное вино' }, { key: 'chianti', label: 'Красное вино' },
+                                { key: 'fowler', label: 'Виски' }, { key: 'beefeater', label: 'Джин' },
+                                { key: 'citadelle', label: 'Джин' }, { key: 'jagermeister', label: 'Ликёр' },
+                                { key: 'бухта омега', label: 'Вино в мини-формате' }, { key: 'адагум', label: 'Вино в мини-формате' },
+                                { key: 'tagua', label: 'Вино в мини-формате' }
+                            ];
+                            const subInfo = subGroups.find(s => first.name.toLowerCase().includes(s.key));
+                            const currentSubLabel = subInfo ? subInfo.label : 'Другое';
+                            if (currentSubLabel !== lastSubLabel) {
+                                subLabelHtml = `<div class="menu-sub-group-title">${currentSubLabel}</div>`;
+                                lastSubLabel = currentSubLabel;
+                            }
+                        }
+                        return variants.length > 1 ? renderDrink(baseName, variants, first, subLabelHtml) : renderSingleDrink(first, subLabelHtml);
+                    }).join('');
+                } else {
+                    renderedItemsHtml = catItems.map(i => renderFood(i)).join('');
+                }
+                
+                return `
+                    <div class="menu-section" data-cat-group="${cat}">
+                        <h2>${categoryNames[cat]}</h2>
+                        <div class="items-grid">
+                            ${renderedItemsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateVariantPrice(select, id) {
+            const priceEl = document.getElementById(`price-${id}`);
+            if (priceEl) priceEl.textContent = `${select.value} ₽`;
+        }
+
+        function addVariantToCart(btn) {
+            const select = btn.previousElementSibling;
+            const price = parseFloat(select.value);
+            const variantName = select.options[select.selectedIndex].dataset.name;
+            addToCart(variantName, price);
+        }
+
+        // Фильтры и поиск
+        document.querySelector('.filter-buttons').addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-btn')) {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const cat = e.target.dataset.category;
+                const filtered = cat === 'all' ? allMenuItems : allMenuItems.filter(i => i.category === cat);
+                renderMenu(filtered);
+            }
+        });
+
+        document.getElementById('menuSearch').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allMenuItems.filter(i => 
+                i.name.toLowerCase().includes(query) || (i.description && i.description.toLowerCase().includes(query))
+            );
+            renderMenu(filtered);
+        });
+
+        loadMenu();
+    </script>
+</body>
+</html>

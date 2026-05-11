@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Авторизация — АэроКафе</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="./css/styles.css">
+	<link rel="stylesheet" href="./css/animations.css">
+    <style>
+        .auth-page { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 32px; width: 100%; max-width: 450px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+        
+        .auth-tabs { display: flex; gap: 4px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 12px; margin-bottom: 24px; }
+        .auth-tab { flex: 1; padding: 10px; border: none; background: transparent; color: var(--muted); cursor: pointer; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; }
+        .auth-tab.active { background: var(--brand); color: #0c111c; }
+        
+        .auth-form { display: none; animation: fadeIn 0.3s ease; }
+        .auth-form.active { display: block; }
+
+        .forgot-link { display: block; text-align: right; font-size: 13px; color: var(--muted); text-decoration: none; margin-top: 8px; margin-bottom: 20px; position: relative; z-index: 10; }
+        .forgot-link:hover { color: var(--brand); }
+
+        .back-to-login { display: block; text-align: center; margin-top: 16px; color: var(--brand); text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+	<header class="site-header">
+		<div class="container header-inner">
+			<a class="logo" href="/">АэроКафе</a>
+		</div>
+	</header>
+
+	<main class="container auth-page" id="authPage">
+		<div class="auth-card" id="authCard">
+            <!-- Табы -->
+            <div id="tabContainer" class="auth-tabs">
+                <button class="auth-tab active" onclick="showForm('login')">Вход</button>
+                <button class="auth-tab" onclick="showForm('register')">Регистрация</button>
+            </div>
+
+            <!-- Форма Входа -->
+            <form id="loginForm" class="auth-form active booking-form">
+                <label>
+                    <span>Email</span>
+                    <input type="email" name="email" required>
+                </label>
+                <label>
+                    <span>Пароль</span>
+                    <input type="password" name="password" required>
+                </label>
+                <a href="#" class="forgot-link" onclick="showForm('forgot')">Забыли пароль?</a>
+                <button type="submit" class="button w-100">Войти</button>
+            </form>
+
+            <!-- Форма Регистрации -->
+            <form id="registerForm" class="auth-form booking-form">
+                <label>
+                    <span>Имя</span>
+                    <input type="text" name="name" required placeholder="Как вас зовут?">
+                </label>
+                <label>
+                    <span>Email</span>
+                    <input type="email" name="email" required>
+                </label>
+                <label>
+                    <span>Дата рождения</span>
+                    <input type="date" name="birthDate">
+                </label>
+                <label>
+                    <span>Пароль</span>
+                    <input type="password" name="password" required minlength="6">
+                </label>
+                <button type="submit" class="button w-100" style="margin-top: 8px;">Создать аккаунт</button>
+            </form>
+
+            <!-- Форма Восстановления -->
+            <div id="forgotForm" class="auth-form">
+                <h3 style="margin-bottom: 16px; text-align: center;">Восстановление</h3>
+                <p style="font-size: 14px; color: var(--muted); margin-bottom: 20px; text-align: center;">
+                    Введите ваш Email, и мы отправим ссылку для сброса пароля.
+                </p>
+                <form onsubmit="handleForgot(event)" class="booking-form">
+                    <label>
+                        <span>Email</span>
+                        <input type="email" id="forgotEmail" required>
+                    </label>
+                    <button type="submit" class="button w-100">Отправить ссылку</button>
+                </form>
+                <a href="#" class="back-to-login" onclick="showForm('login')">Вернуться ко входу</a>
+            </div>
+		</div>
+	</main>
+
+	<script src="./js/main.js"></script>
+	<script>
+        function showForm(type) {
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tabContainer').style.display = (type === 'forgot') ? 'none' : 'flex';
+
+            if (type === 'login') {
+                document.getElementById('loginForm').classList.add('active');
+                document.querySelectorAll('.auth-tab')[0].classList.add('active');
+            } else if (type === 'register') {
+                document.getElementById('registerForm').classList.add('active');
+                document.querySelectorAll('.auth-tab')[1].classList.add('active');
+            } else if (type === 'forgot') {
+                document.getElementById('forgotForm').classList.add('active');
+            }
+        }
+
+        // Обработка Входа
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    showNotification(`Добро пожаловать, ${result.name}!`, 'success');
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('role', result.role);
+                    localStorage.setItem('userName', result.name);
+                    setTimeout(() => {
+                        window.location.href = result.role === 'admin' ? '/admin.html' : '/profile.html';
+                    }, 1000);
+                } else {
+                    showNotification(result.message || 'Ошибка входа', 'error');
+                }
+            } catch (err) { showNotification('Ошибка сервера', 'error'); }
+        });
+
+        // Обработка Регистрации
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    showNotification('Регистрация успешна! Теперь вы можете войти.', 'success');
+                    showForm('login');
+                } else {
+                    showNotification(result.message || 'Ошибка регистрации', 'error');
+                }
+            } catch (err) { showNotification('Ошибка сервера', 'error'); }
+        });
+
+        // Обработка Забытого пароля
+        async function handleForgot(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotEmail').value;
+            try {
+                const res = await fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const result = await res.json();
+                showNotification(result.message, res.ok ? 'success' : 'error');
+                if (res.ok) showForm('login');
+            } catch (err) { showNotification('Ошибка сервера', 'error'); }
+        }
+
+        // Закрытие по клику вне карточки
+        document.getElementById('authPage').addEventListener('click', (e) => {
+            if (e.target.id === 'authPage') {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>
